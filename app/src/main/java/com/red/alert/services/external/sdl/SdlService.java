@@ -11,10 +11,12 @@ import com.red.alert.activities.Main;
 import com.red.alert.activities.external.SdlLockscreen;
 import com.red.alert.config.Logging;
 import com.red.alert.services.sound.StopSoundService;
+import com.red.alert.utils.metadata.LocationData;
 import com.smartdevicelink.exception.SdlException;
 import com.smartdevicelink.exception.SdlExceptionCause;
 import com.smartdevicelink.proxy.RPCRequest;
 import com.smartdevicelink.proxy.SdlProxyALM;
+import com.smartdevicelink.proxy.TTSChunkFactory;
 import com.smartdevicelink.proxy.callbacks.OnServiceEnded;
 import com.smartdevicelink.proxy.callbacks.OnServiceNACKed;
 import com.smartdevicelink.proxy.interfaces.IProxyListenerALM;
@@ -76,6 +78,7 @@ import com.smartdevicelink.proxy.rpc.StreamRPCResponse;
 import com.smartdevicelink.proxy.rpc.SubscribeButtonResponse;
 import com.smartdevicelink.proxy.rpc.SubscribeVehicleDataResponse;
 import com.smartdevicelink.proxy.rpc.SystemRequestResponse;
+import com.smartdevicelink.proxy.rpc.TTSChunk;
 import com.smartdevicelink.proxy.rpc.UnsubscribeButtonResponse;
 import com.smartdevicelink.proxy.rpc.UnsubscribeVehicleDataResponse;
 import com.smartdevicelink.proxy.rpc.UpdateTurnListResponse;
@@ -103,8 +106,7 @@ public class SdlService extends Service implements IProxyListenerALM
     private static final String WELCOME_SPEAK = "Welcome to Red Alert";
 
     // Alert GUI
-    private static final String ALERT_SHOW = "WARNING!";
-    private static final String ALERT_SPEAK = "Warning! A rocket alert is now present in your area";
+    private static final String ALERT_TTS = "WARNING! WARNING! INCOMING! ROCKET ALERT!";
 
     private static final int APP_ICON = R.drawable.ic_warning;
     private static final int ALERT_ICON = R.drawable.ic_warning;
@@ -191,7 +193,7 @@ public class SdlService extends Service implements IProxyListenerALM
         {
             try
             {
-                mProxy = new SdlProxyALM(this, APP_NAME, true, APP_ID);
+                mProxy = new SdlProxyALM(this, APP_NAME, false, APP_ID);
             }
             catch (SdlException e)
             {
@@ -513,15 +515,29 @@ public class SdlService extends Service implements IProxyListenerALM
     /**
      * Will notify the driver when a rocket alert sounds
      */
-    public void notifyRocketAlert(String title, String description)
+    public void notifyRocketAlert(String zone, String cities)
     {
+        // Build TTS message
+        String tts = ALERT_TTS + " " + zone;
+
+        // Get countdown in seconds
+        int countdown = LocationData.getZoneCountdown(zone, this);
+
+        // Build countdown string
+        String countdownString = "ETA " + countdown + " seconds";
+
         try
         {
+            Vector<TTSChunk> chunks = TTSChunkFactory.createSimpleTTSChunks(tts);
+
+            // Alert
+            mProxy.alert(chunks, zone, cities, countdownString, true, 10000, null, mAutoIncCorrId++);
+
             // Set the welcome message on screen
-            mProxy.show(title, ALERT_SPEAK, null, description, null, null, null, getAlertIcon(), new Vector<SoftButton>(), null, TextAlignment.CENTERED, mAutoIncCorrId++);
+            mProxy.show(zone, cities, countdownString, null, null, null, null, getAlertIcon(), new Vector<SoftButton>(), null, TextAlignment.CENTERED, mAutoIncCorrId++);
 
             //Say the welcome message
-            mProxy.speak(ALERT_SPEAK + ". " + title, mAutoIncCorrId++);
+            //mProxy.speak(, mAutoIncCorrId++);
         }
         catch (SdlException e)
         {
