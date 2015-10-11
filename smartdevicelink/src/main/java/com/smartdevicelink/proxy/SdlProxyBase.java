@@ -2776,7 +2776,12 @@ public abstract class SdlProxyBase<proxyListenerType extends IProxyListenerBase>
 		} // end-if notification
 		
 		SdlTrace.logProxyEvent("Proxy received RPC Message: " + functionName, SDL_LIB_TRACE_KEY);
-	}
+
+        if ( rpcMsg.getParameters("success") == "false")
+        {
+            Log.e(TAG, functionName + ": error");
+        }
+    }
 	
 	/**
 	 * Takes an RPCRequest and sends it to SDL.  Responses are captured through callback on IProxyListener.  

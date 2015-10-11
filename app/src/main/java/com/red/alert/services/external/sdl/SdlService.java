@@ -8,7 +8,7 @@ import android.util.Log;
 
 import com.red.alert.R;
 import com.red.alert.activities.Main;
-import com.red.alert.activities.settings.General;
+import com.red.alert.activities.external.SdlLockscreen;
 import com.red.alert.config.Logging;
 import com.red.alert.services.sound.StopSoundService;
 import com.smartdevicelink.exception.SdlException;
@@ -70,6 +70,7 @@ import com.smartdevicelink.proxy.rpc.SetMediaClockTimerResponse;
 import com.smartdevicelink.proxy.rpc.ShowConstantTbtResponse;
 import com.smartdevicelink.proxy.rpc.ShowResponse;
 import com.smartdevicelink.proxy.rpc.SliderResponse;
+import com.smartdevicelink.proxy.rpc.SoftButton;
 import com.smartdevicelink.proxy.rpc.SpeakResponse;
 import com.smartdevicelink.proxy.rpc.StreamRPCResponse;
 import com.smartdevicelink.proxy.rpc.SubscribeButtonResponse;
@@ -91,6 +92,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
 
 public class SdlService extends Service implements IProxyListenerALM
 {
@@ -479,7 +481,7 @@ public class SdlService extends Service implements IProxyListenerALM
             mProxy.show(APP_NAME, WELCOME_SHOW, TextAlignment.CENTERED, mAutoIncCorrId++);
 
             //Say the welcome message
-            mProxy.speak(WELCOME_SPEAK, mAutoIncCorrId++);
+            //mProxy.speak(WELCOME_SPEAK, mAutoIncCorrId++);
         }
         catch (SdlException e)
         {
@@ -487,6 +489,16 @@ public class SdlService extends Service implements IProxyListenerALM
         }
     }
 
+    private Image getAppIcon()
+    {
+        // Set up command icon
+        Image icon = new Image();
+
+        icon.setImageType(ImageType.STATIC);
+        icon.setValue(REMOTE_APP_ICON_FILENAME);
+
+        return icon;
+    }
     /**
      * Will notify the driver when a rocket alert sounds
      */
@@ -495,10 +507,10 @@ public class SdlService extends Service implements IProxyListenerALM
         try
         {
             // Set the welcome message on screen
-            mProxy.show(title, ALERT_SPEAK + " - " + description, TextAlignment.CENTERED, mAutoIncCorrId++);
+            mProxy.show(title, ALERT_SPEAK, description, "123", "TEST", null, "TRACK", getAppIcon(), new Vector<SoftButton>(), null, TextAlignment.CENTERED, mAutoIncCorrId++);
 
             //Say the welcome message
-            mProxy.speak(ALERT_SPEAK + " " + title, mAutoIncCorrId++);
+            mProxy.speak(ALERT_SPEAK + ". " + title, mAutoIncCorrId++);
         }
         catch (SdlException e)
         {
@@ -528,7 +540,8 @@ public class SdlService extends Service implements IProxyListenerALM
 
         // Check the mutable set for the AppIcon
         // If not present, upload the image
-        if (mRemoteFiles == null || !mRemoteFiles.contains(SdlService.REMOTE_APP_ICON_FILENAME))
+        //if (mRemoteFiles == null || !mRemoteFiles.contains(SdlService.REMOTE_APP_ICON_FILENAME))
+        if ( true )
         {
             try
             {
@@ -557,6 +570,7 @@ public class SdlService extends Service implements IProxyListenerALM
     public void onPutFileResponse(PutFileResponse response)
     {
         Log.i(Logging.TAG, "onPutFileResponse from SDL");
+
         if (response.getCorrelationID().intValue() == mIconCorrelationId)
         { //If we have successfully uploaded our icon, we want to set it
             try
@@ -577,7 +591,7 @@ public class SdlService extends Service implements IProxyListenerALM
         if (!mLockScreenDisplayed && notification.getShowLockScreen() == LockScreenStatus.REQUIRED)
         {
             // Show lock screen
-            Intent intent = new Intent(getApplicationContext(), General.class);
+            Intent intent = new Intent(getApplicationContext(), SdlLockscreen.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_NEW_TASK);
             mLockScreenDisplayed = true;
             startActivity(intent);
@@ -995,6 +1009,8 @@ public class SdlService extends Service implements IProxyListenerALM
     @Override
     public void onError(String info, Exception e)
     {
+        Log.d(Logging.TAG, info, e);
+
         // TODO Auto-generated method stub
     }
 

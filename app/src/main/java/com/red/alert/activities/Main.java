@@ -205,7 +205,7 @@ public class Main extends AppCompatActivity
             public void onClick(View view)
             {
                 // DEBUG ONLY
-                AlertLogic.processIncomingAlert("עוטף עזה 217", "alert", Main.this);
+                AlertLogic.processIncomingAlert("חיפה והקריות 75", "alert", Main.this);
 
 //                // Prepare share intent
 //                Intent shareIntent = new Intent(Intent.ACTION_SEND);

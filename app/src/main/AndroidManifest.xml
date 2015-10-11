@@ -221,7 +221,7 @@
 
         <!-- Sync AppLink SDK Integration -->
 
-        <!--<activity android:name=".LockScreenActivity"/>-->
+        <activity android:name=".activities.external.SdlLockscreen" android:launchMode="singleTask"/>
 
         <service android:name=".services.external.sdl.SdlService"></service>
 
