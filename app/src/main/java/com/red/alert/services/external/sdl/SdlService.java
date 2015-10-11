@@ -106,7 +106,8 @@ public class SdlService extends Service implements IProxyListenerALM
     private static final String ALERT_SHOW = "WARNING!";
     private static final String ALERT_SPEAK = "Warning! A rocket alert is now present in your area";
 
-    private static final String REMOTE_APP_ICON_FILENAME = "ic_redalert_4.png";
+    private static final String REMOTE_APP_ICON_FILENAME = "ic_launcher_3.png";
+    private static final String REMOTE_ALERT_ICON_FILENAME = "ic_redalert_2.png";
 
     // "Silence Alert" Command
     private static final int SILENCE_ALERT_COMMAND_ID = 1;
@@ -283,7 +284,7 @@ public class SdlService extends Service implements IProxyListenerALM
     {
         // Add both voice commands
         //addVoiceCommand( SHOW_ALERTS_COMMAND_ID, SHOW_ALERTS_COMMAND, SHOW_ALERTS_ICON );
-        addVoiceCommand( SILENCE_ALERT_COMMAND_ID, SILENCE_ALERT_COMMAND, SILENCE_ALERT_ICON );
+        addVoiceCommand(SILENCE_ALERT_COMMAND_ID, SILENCE_ALERT_COMMAND, SILENCE_ALERT_ICON);
 
         // Log it
         Log.d(Logging.TAG, "Voice commands installed");
@@ -337,8 +338,12 @@ public class SdlService extends Service implements IProxyListenerALM
      *
      * @throws SdlException
      */
-    private void sendIcon() throws SdlException
+    private void sendIcons() throws SdlException
     {
+        // Upload other images
+        uploadImage(R.drawable.ic_cover, REMOTE_ALERT_ICON_FILENAME, mAutoIncCorrId++, true);
+
+        // Upload app icon
         mIconCorrelationId = mAutoIncCorrId++;
         uploadImage(R.drawable.ic_sdl, REMOTE_APP_ICON_FILENAME, mIconCorrelationId, true);
     }
@@ -489,13 +494,13 @@ public class SdlService extends Service implements IProxyListenerALM
         }
     }
 
-    private Image getAppIcon()
+    private Image getAlertIcon()
     {
         // Set up command icon
         Image icon = new Image();
 
         icon.setImageType(ImageType.DYNAMIC);
-        icon.setValue(REMOTE_APP_ICON_FILENAME);
+        icon.setValue(REMOTE_ALERT_ICON_FILENAME);
 
         return icon;
     }
@@ -507,7 +512,7 @@ public class SdlService extends Service implements IProxyListenerALM
         try
         {
             // Set the welcome message on screen
-            mProxy.show(title, ALERT_SPEAK, description, "123", "TEST", null, "TRACK", getAppIcon(), new Vector<SoftButton>(), null, TextAlignment.CENTERED, mAutoIncCorrId++);
+            mProxy.show(title, ALERT_SPEAK, description, "123", "TEST", null, "TRACK", getAlertIcon(), new Vector<SoftButton>(), null, TextAlignment.CENTERED, mAutoIncCorrId++);
 
             //Say the welcome message
             mProxy.speak(ALERT_SPEAK + ". " + title, mAutoIncCorrId++);
@@ -544,7 +549,7 @@ public class SdlService extends Service implements IProxyListenerALM
         {
             try
             {
-                sendIcon();
+                sendIcons();
             }
             catch (SdlException e)
             {
