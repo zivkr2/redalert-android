@@ -1548,7 +1548,10 @@ public abstract class SdlProxyBase<proxyListenerType extends IProxyListenerBase>
 		RPCMessage rpcMsg = new RPCMessage(hash);
 		String functionName = rpcMsg.getFunctionName();
 		String messageType = rpcMsg.getMessageType();
-		
+
+        // Elad added for debug
+        Log.e(TAG, "functionName=" + functionName + "&=success=" + rpcMsg.getParameters("success"));
+
 		if (messageType.equals(RPCMessage.KEY_RESPONSE)) {			
 			SdlTrace.logRPCEvent(InterfaceActivityDirection.Receive, new RPCResponse(rpcMsg), SDL_LIB_TRACE_KEY);
 
@@ -2776,11 +2779,6 @@ public abstract class SdlProxyBase<proxyListenerType extends IProxyListenerBase>
 		} // end-if notification
 		
 		SdlTrace.logProxyEvent("Proxy received RPC Message: " + functionName, SDL_LIB_TRACE_KEY);
-
-        if ( rpcMsg.getParameters("success") == "false")
-        {
-            Log.e(TAG, functionName + ": error");
-        }
     }
 	
 	/**
