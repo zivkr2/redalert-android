@@ -106,8 +106,8 @@ public class SdlService extends Service implements IProxyListenerALM
     private static final String ALERT_SHOW = "WARNING!";
     private static final String ALERT_SPEAK = "Warning! A rocket alert is now present in your area";
 
-    private static final String REMOTE_APP_ICON_FILENAME = "ic_launcher_3.png";
-    private static final String REMOTE_ALERT_ICON_FILENAME = "ic_redalert_2.png";
+    private static final int APP_ICON = R.drawable.ic_warning;
+    private static final int ALERT_ICON = R.drawable.ic_connected;
 
     // "Silence Alert" Command
     private static final int SILENCE_ALERT_COMMAND_ID = 1;
@@ -284,13 +284,13 @@ public class SdlService extends Service implements IProxyListenerALM
     {
         // Add both voice commands
         //addVoiceCommand( SHOW_ALERTS_COMMAND_ID, SHOW_ALERTS_COMMAND, SHOW_ALERTS_ICON );
-        addVoiceCommand(SILENCE_ALERT_COMMAND_ID, SILENCE_ALERT_COMMAND, SILENCE_ALERT_ICON);
+        addVoiceCommand(SILENCE_ALERT_COMMAND_ID, SILENCE_ALERT_COMMAND, ALERT_ICON);
 
         // Log it
         Log.d(Logging.TAG, "Voice commands installed");
     }
 
-    public void addVoiceCommand(int commandId, String voiceCommand, String iconResource)
+    public void addVoiceCommand(int commandId, String voiceCommand, int iconResource)
     {
         // Set up menu option
         MenuParams params = new MenuParams();
@@ -300,7 +300,7 @@ public class SdlService extends Service implements IProxyListenerALM
         Image icon = new Image();
 
         icon.setImageType(ImageType.STATIC);
-        icon.setValue(iconResource);
+        icon.setValue(getResourceFileName(iconResource));
 
         // Set up voice command
         AddCommand command = new AddCommand();
@@ -341,11 +341,16 @@ public class SdlService extends Service implements IProxyListenerALM
     private void sendIcons() throws SdlException
     {
         // Upload other images
-        uploadImage(R.drawable.ic_cover, REMOTE_ALERT_ICON_FILENAME, mAutoIncCorrId++, true);
+        uploadImage(R.drawable.ic_connected, mAutoIncCorrId++, true);
 
         // Upload app icon
         mIconCorrelationId = mAutoIncCorrId++;
-        uploadImage(R.drawable.ic_sdl, REMOTE_APP_ICON_FILENAME, mIconCorrelationId, true);
+        uploadImage(APP_ICON, mIconCorrelationId, true);
+    }
+
+    private String getResourceFileName(int resource)
+    {
+        return resource + ".png";
     }
 
     /**
@@ -356,9 +361,11 @@ public class SdlService extends Service implements IProxyListenerALM
      * @param correlationId the correlation id to be used with this request. Helpful for monitoring putfileresponses
      * @param isPersistent  tell the system if the file should stay or be cleared out after connection.
      */
-    private void uploadImage(int resource, String imageName, int correlationId, boolean isPersistent)
+    private void uploadImage(int resource, int correlationId, boolean isPersistent)
     {
         PutFile putFile = new PutFile();
+
+        String imageName = getResourceFileName(resource);
 
         putFile.setFileType(FileType.GRAPHIC_PNG);
         putFile.setSdlFileName(imageName);
@@ -500,7 +507,7 @@ public class SdlService extends Service implements IProxyListenerALM
         Image icon = new Image();
 
         icon.setImageType(ImageType.DYNAMIC);
-        icon.setValue(REMOTE_ALERT_ICON_FILENAME);
+        icon.setValue(getResourceFileName(ALERT_ICON));
 
         return icon;
     }
@@ -545,7 +552,7 @@ public class SdlService extends Service implements IProxyListenerALM
 
         // Check the mutable set for the AppIcon
         // If not present, upload the image
-        if (mRemoteFiles == null || !mRemoteFiles.contains(SdlService.REMOTE_APP_ICON_FILENAME))
+        if (mRemoteFiles == null || !mRemoteFiles.contains(SdlService.APP_ICON))
         {
             try
             {
@@ -561,7 +568,7 @@ public class SdlService extends Service implements IProxyListenerALM
             try
             {
                 // If the file is already present, send the SetAppIcon request
-                mProxy.setappicon(REMOTE_APP_ICON_FILENAME, mAutoIncCorrId++);
+                mProxy.setappicon(APP_ICON, mAutoIncCorrId++);
             }
             catch (SdlException e)
             {
@@ -579,7 +586,7 @@ public class SdlService extends Service implements IProxyListenerALM
         { //If we have successfully uploaded our icon, we want to set it
             try
             {
-                mProxy.setappicon(REMOTE_APP_ICON_FILENAME, mAutoIncCorrId++);
+                mProxy.setappicon(getResourceFileName(APP_ICON), mAutoIncCorrId++);
             }
             catch (SdlException e)
             {
