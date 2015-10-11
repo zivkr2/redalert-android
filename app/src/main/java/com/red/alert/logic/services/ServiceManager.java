@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.red.alert.logic.location.LocationLogic;
+import com.red.alert.services.external.sdl.SdlService;
 import com.red.alert.services.location.LocationService;
 
 import me.pushy.sdk.Pushy;
@@ -17,6 +18,15 @@ public class ServiceManager
 
         // Start the location service
         startLocationService(context);
+
+        // Start any other services
+        startIntegrationServices(context);
+    }
+
+    public static void startIntegrationServices(Context context)
+    {
+        // Start the SDL service
+        context.startService(new Intent(context, SdlService.class));
     }
 
     public static void startLocationService(Context context)

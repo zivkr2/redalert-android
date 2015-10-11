@@ -96,7 +96,7 @@ public class AlertPopup extends AppCompatActivity
             public void onClick(View view)
             {
                 // Stop the media service
-                StopSoundService.stopSoundService(AlertPopup.this);
+                StopSoundService.stop(AlertPopup.this);
             }
         });
     }

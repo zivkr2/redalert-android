@@ -13,7 +13,7 @@ public class StopSoundService extends Service
     public int onStartCommand(Intent Intent, int Flags, int StartId)
     {
         // Stop currently playing sounds
-        stopSoundService(this);
+        stop(this);
 
         // Don't restart this service
         return START_NOT_STICKY;
@@ -26,7 +26,7 @@ public class StopSoundService extends Service
         return null;
     }
 
-    public static void stopSoundService(final Context context)
+    public static void stop(final Context context)
     {
         // Bind to the sound service
         context.bindService(new Intent(context, PlaySoundService.class), new ServiceConnection()

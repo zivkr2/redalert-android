@@ -2,10 +2,8 @@ package com.red.alert.ui.notifications;
 
 import android.app.NotificationManager;
 import android.content.Context;
-import android.util.Log;
 
 import com.red.alert.R;
-import com.red.alert.config.Logging;
 import com.red.alert.services.sound.StopSoundService;
 
 public class AppNotifications
@@ -19,6 +17,6 @@ public class AppNotifications
         notificationManager.cancel(context.getString(R.string.appName).hashCode());
 
         // Stop alert playing
-        StopSoundService.stopSoundService(context);
+        StopSoundService.stop(context);
     }
 }
