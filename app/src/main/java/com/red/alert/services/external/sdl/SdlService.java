@@ -106,7 +106,7 @@ public class SdlService extends Service implements IProxyListenerALM
     private static final String ALERT_SHOW = "WARNING!";
     private static final String ALERT_SPEAK = "Warning! A rocket alert is now present in your area";
 
-    private static final String REMOTE_APP_ICON_FILENAME = "ic_redalert-4.png";
+    private static final String REMOTE_APP_ICON_FILENAME = "ic_redalert_4.png";
 
     // "Silence Alert" Command
     private static final int SILENCE_ALERT_COMMAND_ID = 1;
@@ -494,7 +494,7 @@ public class SdlService extends Service implements IProxyListenerALM
         // Set up command icon
         Image icon = new Image();
 
-        icon.setImageType(ImageType.STATIC);
+        icon.setImageType(ImageType.DYNAMIC);
         icon.setValue(REMOTE_APP_ICON_FILENAME);
 
         return icon;
@@ -540,8 +540,7 @@ public class SdlService extends Service implements IProxyListenerALM
 
         // Check the mutable set for the AppIcon
         // If not present, upload the image
-        //if (mRemoteFiles == null || !mRemoteFiles.contains(SdlService.REMOTE_APP_ICON_FILENAME))
-        if ( true )
+        if (mRemoteFiles == null || !mRemoteFiles.contains(SdlService.REMOTE_APP_ICON_FILENAME))
         {
             try
             {
@@ -554,9 +553,9 @@ public class SdlService extends Service implements IProxyListenerALM
         }
         else
         {
-            // If the file is already present, send the SetAppIcon request
             try
             {
+                // If the file is already present, send the SetAppIcon request
                 mProxy.setappicon(REMOTE_APP_ICON_FILENAME, mAutoIncCorrId++);
             }
             catch (SdlException e)
