@@ -107,7 +107,7 @@ public class SdlService extends Service implements IProxyListenerALM
     private static final String ALERT_SPEAK = "Warning! A rocket alert is now present in your area";
 
     private static final int APP_ICON = R.drawable.ic_warning;
-    private static final int ALERT_ICON = R.drawable.ic_connected;
+    private static final int ALERT_ICON = R.drawable.ic_warning;
 
     // "Silence Alert" Command
     private static final int SILENCE_ALERT_COMMAND_ID = 1;
@@ -284,13 +284,13 @@ public class SdlService extends Service implements IProxyListenerALM
     {
         // Add both voice commands
         //addVoiceCommand( SHOW_ALERTS_COMMAND_ID, SHOW_ALERTS_COMMAND, SHOW_ALERTS_ICON );
-        addVoiceCommand(SILENCE_ALERT_COMMAND_ID, SILENCE_ALERT_COMMAND, ALERT_ICON);
+        addVoiceCommand(SILENCE_ALERT_COMMAND_ID, SILENCE_ALERT_COMMAND, SILENCE_ALERT_ICON);
 
         // Log it
         Log.d(Logging.TAG, "Voice commands installed");
     }
 
-    public void addVoiceCommand(int commandId, String voiceCommand, int iconResource)
+    public void addVoiceCommand(int commandId, String voiceCommand, String tdkIcon)
     {
         // Set up menu option
         MenuParams params = new MenuParams();
@@ -300,7 +300,7 @@ public class SdlService extends Service implements IProxyListenerALM
         Image icon = new Image();
 
         icon.setImageType(ImageType.STATIC);
-        icon.setValue(getResourceFileName(iconResource));
+        icon.setValue(SILENCE_ALERT_ICON);
 
         // Set up voice command
         AddCommand command = new AddCommand();
@@ -357,7 +357,6 @@ public class SdlService extends Service implements IProxyListenerALM
      * This method will help upload an image to the head unit
      *
      * @param resource      the R.drawable.__ value of the image you wish to send
-     * @param imageName     the filename that will be used to reference this image
      * @param correlationId the correlation id to be used with this request. Helpful for monitoring putfileresponses
      * @param isPersistent  tell the system if the file should stay or be cleared out after connection.
      */
@@ -519,7 +518,7 @@ public class SdlService extends Service implements IProxyListenerALM
         try
         {
             // Set the welcome message on screen
-            mProxy.show(title, ALERT_SPEAK, description, "123", "TEST", null, "TRACK", getAlertIcon(), new Vector<SoftButton>(), null, TextAlignment.CENTERED, mAutoIncCorrId++);
+            mProxy.show(title, ALERT_SPEAK, null, description, null, null, null, getAlertIcon(), new Vector<SoftButton>(), null, TextAlignment.CENTERED, mAutoIncCorrId++);
 
             //Say the welcome message
             mProxy.speak(ALERT_SPEAK + ". " + title, mAutoIncCorrId++);
@@ -552,7 +551,7 @@ public class SdlService extends Service implements IProxyListenerALM
 
         // Check the mutable set for the AppIcon
         // If not present, upload the image
-        if (mRemoteFiles == null || !mRemoteFiles.contains(SdlService.APP_ICON))
+        if (mRemoteFiles == null || !mRemoteFiles.contains(SdlService.APP_ICON) || !mRemoteFiles.contains(SdlService.ALERT_ICON))
         {
             try
             {
@@ -568,7 +567,7 @@ public class SdlService extends Service implements IProxyListenerALM
             try
             {
                 // If the file is already present, send the SetAppIcon request
-                mProxy.setappicon(APP_ICON, mAutoIncCorrId++);
+                mProxy.setappicon(getResourceFileName(APP_ICON), mAutoIncCorrId++);
             }
             catch (SdlException e)
             {
