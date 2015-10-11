@@ -17,6 +17,7 @@ import com.red.alert.config.Logging;
 import com.red.alert.logic.communication.intents.MainActivityParameters;
 import com.red.alert.logic.communication.intents.RocketNotificationParameters;
 import com.red.alert.logic.communication.intents.SoundServiceParameters;
+import com.red.alert.logic.smartdevicelink.SdlIntegration;
 import com.red.alert.services.sound.PlaySoundService;
 import com.red.alert.utils.communication.Broadcasts;
 import com.red.alert.utils.formatting.StringUtils;
@@ -85,6 +86,9 @@ public class RocketNotifications
 
         // Reload recent alerts (if main activity is open)
         Broadcasts.publish(context, MainActivityParameters.RELOAD_RECENT_ALERTS);
+
+        // Alert drivers via Smart Device Link
+        SdlIntegration.alertDriver(context, alertType, notificationTitle, notificationContent);
     }
 
     private static PendingIntent getNotificationDeletedReceiverIntent(Context context)

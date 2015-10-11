@@ -26,6 +26,7 @@ import com.red.alert.config.Alerts;
 import com.red.alert.config.RecentAlerts;
 import com.red.alert.config.Integrations;
 import com.red.alert.config.Logging;
+import com.red.alert.logic.alerts.AlertLogic;
 import com.red.alert.logic.communication.broadcasts.SettingsEvents;
 import com.red.alert.logic.communication.intents.AlertViewParameters;
 import com.red.alert.logic.communication.intents.MainActivityParameters;
@@ -193,7 +194,7 @@ public class Main extends AppCompatActivity
             public void onClick(View v)
             {
                 // DEBUG ONLY
-                //AlertLogic.processIncomingAlert("חיפה והקריות 160", "alert", Main.this);
+                //AlertLogic.processIncomingAlert("עוטף עזה 217", "alert", Main.this);
             }
         });
 
@@ -203,33 +204,36 @@ public class Main extends AppCompatActivity
             @Override
             public void onClick(View view)
             {
-                // Prepare share intent
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                // DEBUG ONLY
+                AlertLogic.processIncomingAlert("עוטף עזה 217", "alert", Main.this);
 
-                // Set as text/plain
-                shareIntent.setType("text/plain");
-
-                // Add text
-                shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.imSafeMessage));
-
-                // Send via WhatsApp?
-                if (Singleton.getSharedPreferences(Main.this).getBoolean(getString(R.string.imSafeWhatsAppPref), false))
-                {
-                    // WhatsApp installed?
-                    if (WhatsApp.isAppInstalled(Main.this))
-                    {
-                        // Set WhatsApp package
-                        shareIntent.setPackage(Integrations.WHATSAPP_PACKAGE);
-                    }
-                    else
-                    {
-                        // Show toast
-                        Toast.makeText(Main.this, getString(R.string.whatsAppNotInstalled), Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                // Show chooser
-                startActivity(Intent.createChooser(shareIntent, getString(R.string.imSafeDesc)));
+//                // Prepare share intent
+//                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+//
+//                // Set as text/plain
+//                shareIntent.setType("text/plain");
+//
+//                // Add text
+//                shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.imSafeMessage));
+//
+//                // Send via WhatsApp?
+//                if (Singleton.getSharedPreferences(Main.this).getBoolean(getString(R.string.imSafeWhatsAppPref), false))
+//                {
+//                    // WhatsApp installed?
+//                    if (WhatsApp.isAppInstalled(Main.this))
+//                    {
+//                        // Set WhatsApp package
+//                        shareIntent.setPackage(Integrations.WHATSAPP_PACKAGE);
+//                    }
+//                    else
+//                    {
+//                        // Show toast
+//                        Toast.makeText(Main.this, getString(R.string.whatsAppNotInstalled), Toast.LENGTH_SHORT).show();
+//                    }
+//                }
+//
+//                // Show chooser
+//                startActivity(Intent.createChooser(shareIntent, getString(R.string.imSafeDesc)));
             }
         });
     }

@@ -2,6 +2,7 @@ package com.red.alert.services.external.sdl;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -99,6 +100,10 @@ public class SdlService extends Service implements IProxyListenerALM
     private static final String WELCOME_SHOW = "Welcome to RedAlert";
     private static final String WELCOME_SPEAK = "Welcome to Red Alert";
 
+    // Alert GUI
+    private static final String ALERT_SHOW = "WARNING!";
+    private static final String ALERT_SPEAK = "Warning! A rocket alert is now present in your area";
+
     private static final String REMOTE_APP_ICON_FILENAME = "ic_redalert-4.png";
 
     // "Silence Alert" Command
@@ -110,6 +115,9 @@ public class SdlService extends Service implements IProxyListenerALM
     private static final int SHOW_ALERTS_COMMAND_ID = 1;
     private static final String SHOW_ALERTS_ICON = "0x4F";
     private static final String SHOW_ALERTS_COMMAND = "Show Alerts";
+
+    // Allow binding to service
+    IBinder mServiceBinder;
 
     List<String> mRemoteFiles;
 
@@ -125,9 +133,10 @@ public class SdlService extends Service implements IProxyListenerALM
     private boolean mIsVehicleDataSubscribed = false;
 
     @Override
-    public IBinder onBind(Intent intent)
+    public IBinder onBind(Intent arg0)
     {
-        return null;
+        // Provide service binder
+        return mServiceBinder;
     }
 
     @Override
@@ -135,7 +144,19 @@ public class SdlService extends Service implements IProxyListenerALM
     {
         super.onCreate();
 
+        // Initialize binder
+        mServiceBinder = new LocalBinder();
+
         mRemoteFiles = new ArrayList<String>();
+    }
+
+    public class LocalBinder extends Binder
+    {
+        public SdlService getService()
+        {
+            // Return the instance
+            return SdlService.this;
+        }
     }
 
     @Override
@@ -259,7 +280,7 @@ public class SdlService extends Service implements IProxyListenerALM
     public void sendCommands()
     {
         // Add both voice commands
-        addVoiceCommand( SHOW_ALERTS_COMMAND_ID, SHOW_ALERTS_COMMAND, SHOW_ALERTS_ICON );
+        //addVoiceCommand( SHOW_ALERTS_COMMAND_ID, SHOW_ALERTS_COMMAND, SHOW_ALERTS_ICON );
         addVoiceCommand( SILENCE_ALERT_COMMAND_ID, SILENCE_ALERT_COMMAND, SILENCE_ALERT_ICON );
 
         // Log it
@@ -459,6 +480,25 @@ public class SdlService extends Service implements IProxyListenerALM
 
             //Say the welcome message
             mProxy.speak(WELCOME_SPEAK, mAutoIncCorrId++);
+        }
+        catch (SdlException e)
+        {
+            Log.e(Logging.TAG, "Exception", e);
+        }
+    }
+
+    /**
+     * Will notify the driver when a rocket alert sounds
+     */
+    public void notifyRocketAlert(String title, String description)
+    {
+        try
+        {
+            // Set the welcome message on screen
+            mProxy.show(title, ALERT_SPEAK + " - " + description, TextAlignment.CENTERED, mAutoIncCorrId++);
+
+            //Say the welcome message
+            mProxy.speak(ALERT_SPEAK + " " + title, mAutoIncCorrId++);
         }
         catch (SdlException e)
         {
