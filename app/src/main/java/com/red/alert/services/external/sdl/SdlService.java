@@ -3,6 +3,7 @@ package com.red.alert.services.external.sdl;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -107,6 +108,7 @@ public class SdlService extends Service implements IProxyListenerALM
 
     // Alert GUI
     private static final String ALERT_TTS = "WARNING! WARNING! INCOMING! ROCKET ALERT!";
+    private static final String PULLOVER_INSTRUCTIONS = "Pull over safely and exit the vehicle";
 
     private static final int APP_ICON = R.drawable.ic_warning;
     private static final int ALERT_ICON = R.drawable.ic_warning;
@@ -122,9 +124,9 @@ public class SdlService extends Service implements IProxyListenerALM
     private static final String SHOW_ALERTS_COMMAND = "Show Alerts";
 
     // Allow binding to service
-    IBinder mServiceBinder;
+    private IBinder mServiceBinder;
 
-    List<String> mRemoteFiles;
+    private List<String> mRemoteFiles;
 
     // variable used to increment correlation ID for every request sent to SYNC
     public int mAutoIncCorrId = 0;
@@ -490,6 +492,9 @@ public class SdlService extends Service implements IProxyListenerALM
     {
         try
         {
+            // Ask for vehicle infoz
+            mProxy.getvehicledata(true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, 4);
+
             // Set the welcome message on screen
             mProxy.show(APP_NAME, WELCOME_SHOW, TextAlignment.CENTERED, mAutoIncCorrId++);
 
@@ -517,14 +522,14 @@ public class SdlService extends Service implements IProxyListenerALM
      */
     public void notifyRocketAlert(String zone, String cities)
     {
-        // Build TTS message
-        String tts = ALERT_TTS + " " + zone;
-
         // Get countdown in seconds
         int countdown = LocationData.getZoneCountdown(zone, this);
 
         // Build countdown string
         String countdownString = "ETA " + countdown + " seconds";
+
+        // Build TTS message
+        String tts = ALERT_TTS + " " + zone + " " + countdownString;
 
         try
         {
@@ -542,6 +547,44 @@ public class SdlService extends Service implements IProxyListenerALM
         catch (SdlException e)
         {
             Log.e(Logging.TAG, "Exception", e);
+        }
+
+        // Wait for tiles to load
+        new Handler().postDelayed(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                //Say the welcome message
+                try
+                {
+                    mProxy.speak(PULLOVER_INSTRUCTIONS, mAutoIncCorrId++);
+                }
+                catch( Exception exc )
+                {
+                    Log.e(Logging.TAG, "Exception", exc);
+                }
+            }
+        }, 11000);
+    }
+
+    /**
+     * Will notify the driver when a rocket alert sounds
+     */
+    public void countdownRocketAlert(String zone, int countdown)
+    {
+        // Build countdown string
+        String countdownString = "ETA " + countdown + " seconds";
+
+        try
+        {
+            // Set the welcome message on screen
+            mProxy.show(zone, PULLOVER_INSTRUCTIONS, countdownString, null, null, null, null, getAlertIcon(), new Vector<SoftButton>(), null, TextAlignment.CENTERED, mAutoIncCorrId++);
+        }
+        catch (SdlException e)
+        {
+            Log.e(Logging.TAG, "Exception", e);
+
         }
     }
 
@@ -701,6 +744,8 @@ public class SdlService extends Service implements IProxyListenerALM
     public void onOnVehicleData(OnVehicleData notification)
     {
         Log.i(Logging.TAG, "Vehicle data notification from SDL");
+
+
         //TODO Put your vehicle data code here
         //ie, notification.getSpeed().
 

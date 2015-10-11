@@ -20,6 +20,7 @@ import com.red.alert.config.Safety;
 import com.red.alert.logic.alerts.AlertTypes;
 import com.red.alert.logic.communication.intents.AlertPopupParameters;
 import com.red.alert.logic.settings.AppPreferences;
+import com.red.alert.logic.smartdevicelink.SdlIntegration;
 import com.red.alert.services.sound.StopSoundService;
 import com.red.alert.ui.localization.rtl.RTLSupport;
 import com.red.alert.utils.feedback.Volume;
@@ -203,6 +204,7 @@ public class AlertPopup extends AppCompatActivity
             // Convert it
             updateCountdownTimerText(seconds, R.color.countdown_pre_impact);
 
+            SdlIntegration.updateSdlDisplay(AlertPopup.this, getTitle().toString(), seconds);
         }
         else if (currentTimestamp > impactTimestamp)
         {
