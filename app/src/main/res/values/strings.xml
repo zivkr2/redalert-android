@@ -289,10 +289,4 @@
     <!-- Sounds -->
     <string translatable="false" name="defaultSound">alarm1</string>
     <string translatable="false" name="defaultSecondarySound">tiny</string>
-
-    <!-- SYNC lock screen-->
-    <string name="lockScreenTitle">RedAlert</string>
-    <string name="lockScreenSubTitle">SYNC Connected</string>
-    <string name="lockScreenActionShow">Say “Show alerts” to view recent alerts</string>
-    <string name="lockScreenActionSilnce">Say \"Silence alarm\" to mute the alarm</string>
 </resources>
