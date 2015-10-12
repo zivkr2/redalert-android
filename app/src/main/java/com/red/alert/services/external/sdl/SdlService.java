@@ -88,6 +88,7 @@ import com.smartdevicelink.proxy.rpc.enums.HMILevel;
 import com.smartdevicelink.proxy.rpc.enums.ImageType;
 import com.smartdevicelink.proxy.rpc.enums.LockScreenStatus;
 import com.smartdevicelink.proxy.rpc.enums.SdlDisconnectedReason;
+import com.smartdevicelink.proxy.rpc.enums.SoftButtonType;
 import com.smartdevicelink.proxy.rpc.enums.TextAlignment;
 
 import java.io.ByteArrayOutputStream;
@@ -108,7 +109,8 @@ public class SdlService extends Service implements IProxyListenerALM
 
     // Alert GUI
     private static final String ALERT_TTS = "WARNING! WARNING! INCOMING! ROCKET ALERT!";
-    private static final String PULLOVER_INSTRUCTIONS = "Pull over safely and exit the vehicle";
+    private static final String PULLOVER_INSTRUCTIONS = "Pull over carefully and exit the vehicle";
+    private static final String PARK_INSTRUCTIONS = "Exit the vehicle, lay on the floor and cover your head";
 
     private static final int APP_ICON = R.drawable.ic_warning;
     private static final int ALERT_ICON = R.drawable.ic_warning;
@@ -135,6 +137,7 @@ public class SdlService extends Service implements IProxyListenerALM
     // variable to create and call functions of the SyncProxy
     private SdlProxyALM mProxy = null;
 
+    private boolean mParked = true;
     private boolean mFirstNonHmiNone = true;
     private boolean mLockScreenDisplayed = false;
     private boolean mIsVehicleDataSubscribed = false;
@@ -492,9 +495,6 @@ public class SdlService extends Service implements IProxyListenerALM
     {
         try
         {
-            // Ask for vehicle infoz
-            mProxy.getvehicledata(true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, 4);
-
             // Set the welcome message on screen
             mProxy.show(APP_NAME, WELCOME_SHOW, TextAlignment.CENTERED, mAutoIncCorrId++);
 
@@ -578,8 +578,24 @@ public class SdlService extends Service implements IProxyListenerALM
 
         try
         {
+            SoftButton newSB = new SoftButton();
+
+            newSB.setText("Park");
+            newSB.setSoftButtonID(1);
+            newSB.setType(SoftButtonType.SBT_TEXT);
+
+            Vector<SoftButton> buttons = new Vector<SoftButton>();
+            buttons.add(newSB);
+
+            String msg = PULLOVER_INSTRUCTIONS;
+
+            if ( mParked )
+            {
+                msg = PARK_INSTRUCTIONS;
+            }
+
             // Set the welcome message on screen
-            mProxy.show(zone, PULLOVER_INSTRUCTIONS, countdownString, null, null, null, null, getAlertIcon(), new Vector<SoftButton>(), null, TextAlignment.CENTERED, mAutoIncCorrId++);
+            mProxy.show(zone, msg, countdownString, null, null, null, null, getAlertIcon(), buttons, null, TextAlignment.CENTERED, mAutoIncCorrId++);
         }
         catch (SdlException e)
         {
@@ -745,7 +761,6 @@ public class SdlService extends Service implements IProxyListenerALM
     {
         Log.i(Logging.TAG, "Vehicle data notification from SDL");
 
-
         //TODO Put your vehicle data code here
         //ie, notification.getSpeed().
 
@@ -836,7 +851,19 @@ public class SdlService extends Service implements IProxyListenerALM
     @Override
     public void onOnButtonPress(OnButtonPress notification)
     {
-        // TODO Auto-generated method stub
+        mParked = true;
+        //Say the welcome message
+        try
+        {
+            mProxy.speak(PARK_INSTRUCTIONS, mAutoIncCorrId++);
+
+            // Set the welcome message on screen
+            //mProxy.show(zone, PARK_INSTRUCTIONS, countdownString, null, null, null, null, getAlertIcon(), buttons, null, TextAlignment.CENTERED, mAutoIncCorrId++);
+        }
+        catch( Exception exc )
+        {
+            Log.e(Logging.TAG, "Exception", exc);
+        }
     }
 
     @Override
@@ -869,6 +896,7 @@ public class SdlService extends Service implements IProxyListenerALM
     @Override
     public void onGetVehicleDataResponse(GetVehicleDataResponse response)
     {
+        int x = 1;
         // TODO Auto-generated method stub
 
     }
